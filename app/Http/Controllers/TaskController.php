@@ -29,14 +29,11 @@ class TaskController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function index() {
-        $tasks = Task::with('poster')->with('users')->get();
+        $tasks = Task::with('poster')->with('users')->orderBy('deadline', 'asc')->get();
         return response()->json([
             'success' => true,
             'post' => [
                 'tasks' => $tasks,
-                'todos' => $tasks,
-                'dones' => $tasks,
-                'posts' => $tasks,
             ],
             'message' => '已获取所有任务信息',
         ]);
@@ -48,18 +45,18 @@ class TaskController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function all($id = 1) {
-        $user = User::with('tasks')->with('posts')->find($id);
-        $tasks = $user->tasks()->with('poster')->get();
-        $posts = $user->posts()->with('users')->get();
-        $todos = $user->tasks()->with('poster')->where('status', 1)->get();
-        $dones = $user->tasks()->with('poster')->where('status', 5)->get();
+    public function all($id) {
+        $user = User::find($id);
+        $tasks = $user->tasks()->with('poster')->orderBy('deadline', 'asc')->get();
+        $posts = $user->posts()->with('users')->orderBy('deadline', 'asc')->get();
+//        $todos = $user->tasks()->with('poster')->where('status', 1)->get();
+//        $dones = $user->tasks()->with('poster')->where('status', 5)->get();
         return response()->json([
             'success' => true,
             'post' => [
                 'tasks' => $tasks,
-                'todos' => $todos,
-                'dones' => $dones,
+//                'todos' => $todos,
+//                'dones' => $dones,
                 'posts' => $posts,
             ],
             'message' => '已获取与'.$user->name.'有关的所有任务信息',
@@ -75,12 +72,23 @@ class TaskController extends Controller
     public function create(Request $request) {
         $input = $request->json()->all();
         $task = Task::create($input);
+        $users = $request->json()->get('users');
+        if($task->id) {
+            $task->users()->sync($users);
+            return response()->json([
+                'success' => true,
+                'post' => [
+                    'task' => $task,
+                ],
+                'message' => '任务'.$task->name.'已成功创建',
+            ]);
+        }
         return response()->json([
-            'success' => true,
+            'success' => false,
             'post' => [
                 'task' => $task,
             ],
-            'message' => '任务'.$task->name.'已成功创建',
+            'message' => '任务'.$task->name.'创建失败',
         ]);
     }
 
@@ -95,6 +103,32 @@ class TaskController extends Controller
         $input = $request->json()->all();
         $task = Task::where('id', $id)->update($input);
         if($task){
+            return response()->json([
+                'success' => true,
+                'post' => [
+
+                ],
+                'message' => '任务信息更新成功',
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'post' => [
+
+            ],
+            'message' => '任务信息更新失败',
+        ]);
+    }
+
+    public function update(Request $request, $id){
+        $task = Task::find($id);
+        $task->name = $request->json()->get('name');
+        $task->intro = $request->json()->get('intro');
+        $task->content = $request->json()->get('content');
+        $task->deadline = $request->json()->get('deadline');
+        $users = $request->json()->get('users');
+        if($task->save()){
+            $task->users()->sync($users);
             return response()->json([
                 'success' => true,
                 'post' => [

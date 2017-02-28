@@ -35,7 +35,7 @@ class NoticeController extends Controller
             'post' => [
                 'notices' => $notices,
             ],
-            'message' => '已获取所有通知',
+            'message' => '已获取所有公告信息',
         ]);
     }
 
@@ -75,10 +75,7 @@ class NoticeController extends Controller
             'post' => [
                 'notice' => $notice,
             ],
-            'message' => [
-                'type' => 'success',
-                'content' => '公告更新成功',
-            ],
+            'message' => '公告更新成功',
         ]);
     }
 
@@ -90,28 +87,21 @@ class NoticeController extends Controller
      */
     public function delete($id) {
         $res = Notice::destroy($id);
-        $notices = Notice::with('publisher')->get();
         if($res === 0) {
             return response()->json([
                 'success' => false,
                 'post' => [
-                    'notices' => $notices,
+
                 ],
-                'message' => [
-                    'type' => 'warning',
-                    'content' => '删除失败',
-                ],
+                'message' => '删除失败',
             ]);
         }
         return response()->json([
             'success' => true,
             'post' => [
-                'notices' => $notices,
+
             ],
-            'message' => [
-                'type' => 'success',
-                'content' => '删除成功，即将更新',
-            ],
+            'message' => '删除成功，即将更新',
         ]);
     }
 
@@ -129,10 +119,7 @@ class NoticeController extends Controller
             'post' => [
                 'notices' => $notices,
             ],
-            'message' => [
-                'type' => 'success',
-                'content' => '查询完成，以下是查询结果',
-            ],
+            'message' => '查询完成，以下是查询结果',
         ]);
     }
 
@@ -150,10 +137,7 @@ class NoticeController extends Controller
                 'post' => [
                     'notice' => null,
                 ],
-                'message' => [
-                    'type' => 'success',
-                    'content' => '该公告不存在',
-                ],
+                'message' => '该公告不存在',
             ]);
         }
         return response()->json([
@@ -161,10 +145,7 @@ class NoticeController extends Controller
             'post' => [
                 'notice' => $notice,
             ],
-            'message' => [
-                'type' => 'success',
-                'content' => '已成功获取公告详情',
-            ],
+            'message' => '已成功获取公告详情',
         ]);
     }
 }

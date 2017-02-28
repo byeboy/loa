@@ -161,6 +161,26 @@ class UserController extends Controller
         ]);
     }
 
+    public function auth(Request $request)
+    {
+        if ($request->header('authorization')) {
+            $email = decrypt($request->header('authorization'));
+            $user = User::with('branch')->where('email', $email)->first();
+            return response()->json([
+                'success' => true,
+                'post' => [
+                    'loginUser' => $user
+                ],
+                'message' => '尊敬的'.$user->name.'，欢迎回来^_^',
+            ]);
+        }
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '您尚未登录，请登录。:(',
+            ]);
+    }
+
     /**
      * function for Reg
      *
@@ -181,6 +201,7 @@ class UserController extends Controller
         $user->password = encrypt($request->json()->get('password'));
         $user->name = $request->json()->get('name');
         $user->phone = $request->json()->get('phone');
+        $user->branch_id = 28;
         $user->save();
         return response()->json([
             'success' => true,
@@ -202,12 +223,15 @@ class UserController extends Controller
         if ($user) {
             $password = $request->json()->get('password');
             if ($password === decrypt($user->password)) {
+                $authorization = encrypt($user->email);
                 return response()->json([
                     'success' => true,
                     'post' => [
                         'loginUser' => $user,
                     ],
                     'message' => '登录成功，欢迎回来',
+                ])->withHeaders([
+                    "authorization" => $authorization,
                 ]);
             } else {
                 return response()->json([

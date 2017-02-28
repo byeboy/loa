@@ -77,10 +77,9 @@ class BranchController extends Controller
     public function update(Request $request, $id) {
         $branch = Branch::find($id);
         $branch->name = $request->json()->get('name');
-        if($this->check($branch->name) === null) {
-            $branch->intro = $request->json()->get('intro');
-            $branch->authority = $request->json()->get('authority');
-            $branch->save();
+        $branch->intro = $request->json()->get('intro');
+        $branch->authority = $request->json()->get('authority');
+        if($branch->save()) {
             return response()->json([
                 'success' => true,
                 'post' => [
