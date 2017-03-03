@@ -124,7 +124,7 @@ class UserController extends Controller
 //        if($val == null || $val == '') {
 //            $users = User::with('branch')->get();
 //        } else {
-        $users = User::with('branch')->where($param, 'LIKE', '%'.$val.'%')->get();
+        $users = User::with('branch')->where($param, 'LIKE', '%'.urldecode($val).'%')->get();
 //        }
         return response()->json([
             'success' => true,

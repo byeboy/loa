@@ -113,7 +113,7 @@ class NoticeController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function search($param, $val) {
-        $notices = Notice::with('publisher')->where($param, 'LIKE', '%'.$val.'%')->get();
+        $notices = Notice::with('publisher')->where($param, 'LIKE', '%'.urldecode($val).'%')->get();
         return response()->json([
             'success' => true,
             'post' => [

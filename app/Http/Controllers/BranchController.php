@@ -133,7 +133,7 @@ class BranchController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function search($param, $val) {
-        $branches = Branch::withCount('users')->where($param, 'LIKE', '%'.$val.'%')->get();
+        $branches = Branch::withCount('users')->where($param, 'LIKE', '%'.urldecode($val).'%')->get();
         return response()->json([
             'success' => true,
             'post' => [
