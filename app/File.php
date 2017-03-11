@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Gilbert
- * Date: 17/2/15
- * Time: 上午11:44
+ * Date: 17/3/7
+ * Time: 下午3:30
  */
 
 namespace App;
@@ -11,7 +11,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Task extends Model
+class File extends Model
 {
     /**
      * 设置主键
@@ -24,7 +24,7 @@ class Task extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'intro', 'content', 'deadline', 'poster_id',
+        'name', 'url', 'uploader_id',
     ];
 
     /**
@@ -37,19 +37,15 @@ class Task extends Model
     /**
      * 模型关联
      */
-    public function poster() {
-        return $this->belongsTo('App\User', 'poster_id', 'id');
+    public function uploader() {
+        return $this->belongsTo('App\User', 'uploader_id', 'id');
     }
 
-    public function users() {
-        return $this->belongsToMany('App\User');
+    public function tasks() {
+        return $this->belongsToMany('App\Task', 'task_file');
     }
 
-    public function steps() {
-        return $this->hasMany('App\Step', 'task_id', 'id');
-    }
-
-    public function files() {
-        return $this->belongsToMany('App\File', 'task_file');
+    public function parts() {
+        return $this->belongsToMany('App\Part', 'part_file');
     }
 }

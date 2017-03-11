@@ -166,13 +166,16 @@ class UserController extends Controller
         if ($request->header('authorization')) {
             $email = decrypt($request->header('authorization'));
             $user = User::with('branch')->where('email', $email)->first();
-            return response()->json([
-                'success' => true,
-                'post' => [
-                    'loginUser' => $user
-                ],
-                'message' => '尊敬的'.$user->name.'，欢迎回来^_^',
-            ]);
+            if($user) {
+                return response()->json([
+                    'success' => true,
+                    'post' => [
+                        'loginUser' => $user
+                    ],
+                    'message' => '尊敬的'.$user->name.'，欢迎回来^_^',
+                ]);
+            }
+            return response('Unauthorized.', 401);
         }
             return response()->json([
                 'success' => false,
@@ -201,7 +204,6 @@ class UserController extends Controller
         $user->password = encrypt($request->json()->get('password'));
         $user->name = $request->json()->get('name');
         $user->phone = $request->json()->get('phone');
-        $user->branch_id = 28;
         $user->save();
         return response()->json([
             'success' => true,

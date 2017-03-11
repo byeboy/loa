@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNoticeTable extends Migration
+class CreateModelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,11 @@ class CreateNoticeTable extends Migration
      */
     public function up()
     {
-        Schema::create('notices', function (Blueprint $table) {
+        Schema::create('models', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
+            $table->string('name')->unique();
             $table->string('intro')->nullable();
-            $table->longText('content');
-            $table->integer('publisher_id')->unsigned()->nullable()->index();
             $table->timestamps();
-            $table->foreign('publisher_id')->references('id')->on('users')
-                ->onUpdate('cascade')->onDelete('set null');
         });
     }
 
@@ -32,6 +28,6 @@ class CreateNoticeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notices');
+        Schema::dropIfExists('models');
     }
 }
