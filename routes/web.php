@@ -15,6 +15,7 @@ $app->get('/', function () use ($app) {
     return $app->version();
 });
 $app->get('users', 'UserController@index');
+$app->post('/tasks', 'TaskController@create');
 
 
 $app->group(['prefix' => 'api'], function () use ($app) {
@@ -23,6 +24,7 @@ $app->group(['prefix' => 'api'], function () use ($app) {
     });
     $app->post('reg', 'UserController@reg');
     $app->post('login', 'UserController@login');
+    $app->post('files', 'FileController@create');
     $app->get('auth', 'UserController@auth');
 
     $app->get('test', 'BranchController@test');
@@ -77,7 +79,59 @@ $app->group(['prefix' => 'api'], function () use ($app) {
         $app->post('tasks', 'TaskController@create');
         $app->put('tasks/{id}', 'TaskController@update');
         $app->patch('tasks/{id}', 'TaskController@patch');
+        $app->patch('steps/{id}', 'TaskController@stepPatch');
         $app->delete('tasks/{id}', 'TaskController@delete');
+
+        /**
+         * Routes for PartProperty
+         *
+         * REST
+         */
+        $app->get('part-properties', 'PartPropertyController@index');
+        $app->get('cabinets/{id}', 'CabinetController@get');
+        $app->get('cabinets/{param}/{val}', 'CabinetController@search');
+        $app->post('cabinets', 'CabinetController@create');
+        $app->put('cabinets/{id}', 'CabinetController@update');
+        $app->delete('cabinets/{id}', 'CabinetController@delete');
+
+        /**
+         * Routes for Material
+         *
+         * REST
+         */
+        $app->get('materials', 'MaterialController@index');
+        $app->get('materials/{id}', 'MaterialController@get');
+        $app->get('materials/{param}/{val}', 'MaterialController@search');
+        $app->post('materials', 'MaterialController@create');
+        $app->put('materials/{id}', 'MaterialController@update');
+        $app->patch('materials/{id}', 'MaterialController@patch');
+        $app->delete('materials/{id}', 'MaterialController@delete');
+
+        /**
+         * Routes for Model
+         *
+         * REST
+         */
+        $app->get('models', 'ModelController@index');
+        $app->get('models/{id}', 'ModelController@get');
+        $app->get('models/{param}/{val}', 'ModelController@search');
+        $app->post('models', 'ModelController@create');
+        $app->put('models/{id}', 'ModelController@update');
+        $app->patch('models/{id}', 'ModelController@patch');
+        $app->delete('models/{id}', 'ModelController@delete');
+
+        /**
+         * Routes for Cabinet
+         *
+         * REST
+         */
+        $app->get('cabinets', 'CabinetController@index');
+        $app->get('cabinets/{id}', 'CabinetController@get');
+        $app->get('cabinets/{param}/{val}', 'CabinetController@search');
+        $app->post('cabinets', 'CabinetController@create');
+        $app->put('cabinets/{id}', 'CabinetController@update');
+        $app->patch('cabinets/{id}', 'CabinetController@patch');
+        $app->delete('cabinets/{id}', 'CabinetController@delete');
     });
 
 //    $app->group(['prefix' => 'branch'], function () use ($app) {

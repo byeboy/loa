@@ -20,8 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('phone');
             $table->string('img')->nullable();
-            $table->string('api_token')->nullable();
-            $table->integer('branch_id')->unsigned()->nullable();
+            $table->integer('branch_id')->unsigned()->nullable()->index();
             $table->timestamps();
             $table->foreign('branch_id')->references('id')->on('branches')
                 ->onUpdate('cascade')->onDelete('set null');
