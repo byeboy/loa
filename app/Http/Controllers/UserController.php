@@ -261,4 +261,11 @@ class UserController extends Controller
         $user = User::with('branch')->where('email', $email)->first();
         return $user;
     }
+
+    public function test(){
+        $test = User::with('tasks.files', 'branch')->get();
+        return response()->json([
+            'test' => $test,
+        ]);
+    }
 }

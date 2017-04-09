@@ -24,7 +24,7 @@ class Task extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'intro', 'content', 'deadline', 'poster_id',
+        'name', 'intro', 'content', 'deadline', 'poster_id', 'checker_id', 'status', 'progress',
     ];
 
     /**
@@ -41,6 +41,10 @@ class Task extends Model
         return $this->belongsTo('App\User', 'poster_id', 'id');
     }
 
+    public function checker() {
+        return $this->belongsTo('App\User', 'checker_id', 'id');
+    }
+
     public function users() {
         return $this->belongsToMany('App\User');
     }
@@ -51,5 +55,18 @@ class Task extends Model
 
     public function files() {
         return $this->belongsToMany('App\File', 'task_file');
+    }
+
+    public function models() {
+        return $this->morphedByMany('App\Model', 'taskgable')->withPivot('done_count', 'plan_count');
+    }
+    public function cabinets() {
+        return $this->morphedByMany('App\Cabinet', 'taskgable')->withPivot('done_count', 'plan_count');
+    }
+    public function fans() {
+        return $this->morphedByMany('App\Fan', 'taskgable')->withPivot('done_count', 'plan_count');
+    }
+    public function parts() {
+        return $this->morphedByMany('App\Part', 'taskgable')->withPivot('done_count', 'plan_count');
     }
 }

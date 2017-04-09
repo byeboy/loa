@@ -24,7 +24,7 @@ class Part extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'intro', 'material_id', 'model_id', 'cabinet_id', 'branch_id', 'count',
+        'name', 'intro', 'count', 'remark', 'created_at', 'updated_at',
     ];
 
     /**
@@ -37,23 +37,45 @@ class Part extends Model
     /**
      * 模型关联
      */
-    public function material() {
-        return $this->belongsTo('App\Material', 'material_id', 'id');
+
+    /**
+     * 获取该零件下所有的车型。
+     */
+    public function models()
+    {
+        return $this->morphedByMany('App\Model', 'partgable');
     }
 
-    public function model() {
-        return $this->belongsTo('App\Model', 'model_id', 'id');
+    /**
+     * 获取该零件下所有的风机。
+     */
+    public function cabinets()
+    {
+        return $this->morphedByMany('App\Cabinet', 'partgable');
     }
 
-    public function cabinet() {
-        return $this->belongsTo('App\Cabinet', 'cabinet_id', 'id');
+    /**
+     * 获取该零件下所有的风机。
+     */
+    public function fans()
+    {
+        return $this->morphedByMany('App\Fan', 'partgable');
     }
 
-    public function branch() {
-        return $this->belongsTo('App\Branch', 'branch_id', 'id');
+    /**
+     * 获取该零件下所有的工程文件。
+     */
+    public function files()
+    {
+        return $this->morphToMany('App\File', 'filegable');
     }
 
-    public function files() {
-        return $this->belongsToMany('App\File', 'part_file');
+    /**
+     * 获取该零件下所有的仓储记录。
+     */
+    public function records()
+    {
+        return $this->morphMany('App\Record', 'recordable');
     }
+
 }

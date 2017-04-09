@@ -17,6 +17,8 @@ class CreateModelsTable extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->string('intro')->nullable();
+            $table->integer('count')->unsigned();
+            $table->string('remark')->nullable();
             $table->timestamps();
         });
     }

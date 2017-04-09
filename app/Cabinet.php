@@ -24,7 +24,7 @@ class Cabinet extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'intro',
+        'name', 'intro', 'count', 'remark', 'created_at', 'updated_at',
     ];
 
     /**
@@ -37,7 +37,35 @@ class Cabinet extends Model
     /**
      * 模型关联
      */
-    public function parts() {
-        return $this->hasMany('App\Part', 'cabinet_id', 'id');
+    /**
+     * 获取该柜体所属的所有车型。
+     */
+    public function models()
+    {
+        return $this->morphToMany('App\Model', 'modelgable');
+    }
+
+    /**
+     * 获取该柜体下所有的零件。
+     */
+    public function parts()
+    {
+        return $this->morphToMany('App\Part', 'partgable')->withPivot('required_count');
+    }
+
+    /**
+     * 获取该柜体下所有的工程文件。
+     */
+    public function files()
+    {
+        return $this->morphToMany('App\File', 'filegable');
+    }
+
+    /**
+     * 获取该柜体下所有的仓储记录。
+     */
+    public function records()
+    {
+        return $this->morphMany('App\Record', 'recordable');
     }
 }

@@ -45,7 +45,23 @@ class File extends Model
         return $this->belongsToMany('App\Task', 'task_file');
     }
 
-    public function parts() {
-        return $this->belongsToMany('App\Part', 'part_file');
+    public function models()
+    {
+        return $this->morphedByMany('App\Model', 'filegable');
+    }
+
+    public function cabinets()
+    {
+        return $this->morphedByMany('App\Cabinet', 'filegable');
+    }
+
+    public function fans()
+    {
+        return $this->morphedByMany('App\Fan', 'filegable');
+    }
+
+    public function parts()
+    {
+        return $this->morphedByMany('App\Part', 'filegable');
     }
 }

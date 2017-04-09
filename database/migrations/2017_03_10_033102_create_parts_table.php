@@ -17,20 +17,9 @@ class CreatePartsTable extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->string('intro')->nullable();
-            $table->integer('material_id')->unsigned()->nullable()->index();
-            $table->integer('model_id')->unsigned()->nullable()->index();
-            $table->integer('cabinet_id')->unsigned()->nullable()->index();
-            $table->integer('branch_id')->unsigned()->nullable()->index();
             $table->integer('count')->unsigned();
+            $table->string('remark')->nullable();
             $table->timestamps();
-            $table->foreign('material_id')->references('id')->on('materials')
-                ->onUpdate('cascade')->onDelete('set null');
-            $table->foreign('model_id')->references('id')->on('models')
-                ->onUpdate('cascade')->onDelete('set null');
-            $table->foreign('cabinet_id')->references('id')->on('cabinets')
-                ->onUpdate('cascade')->onDelete('set null');
-            $table->foreign('branch_id')->references('id')->on('branches')
-                ->onUpdate('cascade')->onDelete('set null');
         });
     }
 

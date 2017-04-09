@@ -22,7 +22,7 @@ class Model extends \Illuminate\Database\Eloquent\Model
      * @var array
      */
     protected $fillable = [
-        'name', 'intro',
+        'name', 'intro', 'count', 'remark', 'created_at', 'updated_at',
     ];
 
     /**
@@ -35,7 +35,43 @@ class Model extends \Illuminate\Database\Eloquent\Model
     /**
      * 模型关联
      */
-    public function parts() {
-        return $this->hasMany('App\Part', 'model_id', 'id');
+    /**
+     * 获取该车型下所有的柜体。
+     */
+    public function cabinets()
+    {
+        return $this->morphedByMany('App\Cabinet', 'modelgable')->withPivot('required_count');
+    }
+
+    /**
+     * 获取该车型下所有的风机。
+     */
+    public function fans()
+    {
+        return $this->morphedByMany('App\Fan', 'modelgable')->withPivot('required_count');
+    }
+
+    /**
+     * 获取该车型下所有的零件。
+     */
+    public function parts()
+    {
+        return $this->morphToMany('App\Part', 'partgable')->withPivot('required_count');
+    }
+
+    /**
+     * 获取该车型下所有的工程文件。
+     */
+    public function files()
+    {
+        return $this->morphToMany('App\File', 'filegable');
+    }
+
+    /**
+     * 获取该车型下所有的仓储记录。
+     */
+    public function records()
+    {
+        return $this->morphMany('App\Record', 'recordable');
     }
 }

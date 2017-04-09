@@ -15,15 +15,10 @@ class CreateStepsTable extends Migration
     {
         Schema::create('steps', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->integer('status');
             $table->integer('task_id')->unsigned()->index();
-            $table->integer('user_id')->unsigned()->nullable()->index();
             $table->timestamps();
             $table->foreign('task_id')->references('id')->on('tasks')
                 ->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')
-                ->onUpdate('cascade')->onDelete('set null');
         });
     }
 
