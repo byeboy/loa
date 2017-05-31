@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Events\NoticeEvent;
 use App\Notice;
 use Illuminate\Http\Request;
 use Mockery\Matcher\Not;
@@ -48,6 +49,7 @@ class NoticeController extends Controller
     public function create(Request $request) {
         $input = $request->json()->all();
         $notice = Notice::create($input);
+        event(new NoticeEvent($notice));
         return response()->json([
             'success' => true,
             'post' => [

@@ -9,6 +9,8 @@
 namespace App\Http\Controllers;
 
 
+use App\Events\TaskCreate;
+use App\Events\TaskUpdate;
 use App\Step;
 use App\Task;
 use App\User;
@@ -173,7 +175,8 @@ class TaskController extends Controller
                             foreach ($product['data'] as $pd){
                                 $old = $task->cabinets()->where('taskgable_id', $pd['id'])->first();
                                 if(count($old) !== 0){
-                                    $task->cabinets()->syncWithoutDetaching([$pd['id'], ['plan_count' => $old->pivot->plan_count + $pd['plan_count']]]);
+                                    $task->cabinets()->syncWithoutDetaching([$pd['id'],
+                                        ['plan_count' => $old->pivot->plan_count + $pd['plan_count']]]);
                                 } else {
                                     $task->cabinets()->attach($pd['id'], ['plan_count' => $pd['plan_count']]);
                                 }
@@ -181,9 +184,11 @@ class TaskController extends Controller
                                     foreach ($pd['parts'] as $part){
                                         $old = $task->parts()->where('taskgable_id', $part['id'])->first();
                                         if(count($old) !== 0){
-                                            $task->parts()->syncWithoutDetaching([$part['id'], ['plan_count' => $old->plan_count + $pd['plan_count'] * $part['pivot']['required_count']]]);
+                                            $task->parts()->syncWithoutDetaching([$part['id'],
+                                                ['plan_count' => $old->plan_count + $pd['plan_count'] * $part['pivot']['required_count']]]);
                                         } else {
-                                            $task->parts()->attach($part['id'], ['plan_count' => $pd['plan_count'] * $part['pivot']['required_count']]);
+                                            $task->parts()->attach($part['id'],
+                                                ['plan_count' => $pd['plan_count'] * $part['pivot']['required_count']]);
                                         }
                                     }
                                 }
@@ -227,7 +232,8 @@ class TaskController extends Controller
                 }
             }
             $task->users()->sync($doers);
-            $post = Task::with('models.files', 'cabinets.files', 'fans.files', 'parts.files', 'users')->where('id', $task->id)->first();
+            $post = Task::with('models.files', 'cabinets.files', 'fans.files', 'parts.files', 'users', 'poster')->where('id', $task->id)->first();
+            event(new TaskCreate($post));
             return response()->json([
                 'success' => true,
                 'post' => [
@@ -381,6 +387,7 @@ class TaskController extends Controller
         }
         $task->save();
         $post = Task::with('models.files', 'cabinets.files', 'fans.files', 'parts.files', 'poster', 'users')->where('id', $task->id)->first();
+        event(new TaskUpdate($post));
         return response()->json([
             'success' => true,
             'post' => $post,

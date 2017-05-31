@@ -276,6 +276,95 @@ class CabinetController extends Controller
         }
     }
 
+    public function record() {
+        $cabinets = Cabinet::with('records.operator')->get();
+        if($cabinets) {
+            return response()->json([
+                'success' => true,
+                'post' => [
+                    'cabinets' => $cabinets,
+                ],
+                'message' => '已获取所有柜体信息'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '获取柜体信息失败'
+            ]);
+        }
+    }
+
+    public function recorder(Request $request, $id){
+        $cabinet = Cabinet::find($id);
+        if($cabinet === null) {
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '该柜体不存在',
+            ]);
+        }
+        $type = $request->json()->get('type');
+        $count = $request->json()->get('count');
+        if($type === 0 && $count > $cabinet->count){
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '该柜体库存不足',
+            ]);
+        }
+        $remark = $request->json()->get('remark');
+        $operator_id = $request->json()->get('operator_id');
+        $recordrst = $cabinet->records()->create([
+            'type' => $type,
+            'count' => $count,
+            'remark' => $remark,
+            'operator_id' => $operator_id,
+        ]);
+        if($recordrst !== null) {
+            $operate = null;
+            switch ($type) {
+                case 0: {
+                    $cabinet->count -= $count;
+                    $operate = '出库';
+                    break;
+                }
+                case 1: {
+                    $cabinet->count += $count;
+                    $operate = '入库';
+                    break;
+                }
+                default: {
+                    return response()->json([
+                        'success' => false,
+                        'post' => null,
+                        'message' => '非法操作',
+                    ]);
+                }
+            }
+            if($cabinet->save()){
+                $newCabinet = Cabinet::with('records.operator')->find($id);
+                return response()->json([
+                    'success' => true,
+                    'post' => $newCabinet,
+                    'message' => $operate.'操作成功',
+                ]);
+            } else {
+                $cabinet->records()->detach([$recordrst->id]);
+                return response()->json([
+                    'success' => false,
+                    'post' => $cabinet,
+                    'message' => $operate.'操作失败',
+                ]);
+            }
+        }
+        return response()->json([
+            'success' => false,
+            'post' => $cabinet,
+            'message' => '操作失败',
+        ]);
+    }
+
     /**
      * Check name of Cabinet
      *

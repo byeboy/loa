@@ -87,7 +87,7 @@ class ModelController extends Controller
             }
             $newId = array_diff($id, $relations);
             Model::find($upId)->files()->attach($newId);
-//        检测关联成功与否
+            //        检测关联成功与否
             $res = Model::find($upId)->files()->whereIn('file_id', $id)->exists();
             if($res) {
                 $model = Model::with('files')->find($upId);
@@ -329,13 +329,11 @@ class ModelController extends Controller
             switch ($type) {
                 case 0: {
                     $model->count -= $count;
-                    $operate = '出库';
-                    break;
+                    $operate = '出库'; break;
                 }
                 case 1: {
                     $model->count += $count;
-                    $operate = '入库';
-                    break;
+                    $operate = '入库'; break;
                 }
                 default: {
                     return response()->json([

@@ -47,7 +47,7 @@ class UserController extends Controller
     public function create(Request $request) {
         $input = $request->json()->all();
         $email = $request->json()->get('email');
-        if($this->check($email) === null) {
+        if($this->check($email)) {
             $user = User::create($input);
             return response()->json([
                 'success' => true,
@@ -84,6 +84,39 @@ class UserController extends Controller
             ],
             'message' => '更新成功',
         ]);
+    }
+
+    public function rewrite(Request $request, $id) {
+
+        $user = User::find($id);
+//        $oldPwd = $request->json()->get('oldPwd');
+//        return response()->json([
+//           'id' => $id,
+//            'old' => $oldPwd,
+//        ]);
+        if($request->json()->get('oldPwd') === decrypt($user->password)) {
+            if($request->json()->get('newPwd') === decrypt($user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'post' => null,
+                    'message' => '新旧密码不可相同',
+                ]);
+            } else {
+                $user->password = encrypt($request->json()->get('newPwd'));
+                $user->save();
+                return response()->json([
+                    'success' => true,
+                    'post' => null,
+                    'message' => '密码修改成功，请重新登录',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '原密码错误，请确认用户权限',
+            ]);
+        }
     }
 
     /**
@@ -193,24 +226,29 @@ class UserController extends Controller
     public function reg(Request $request) {
         $user = new User();
         $user->email = $request->json()->get('email');
-        $Ucheck = $this->check($user->email);
-        if($Ucheck) {
+        if($this->check($user->email)) {
             return response()->json([
                 'success' => false,
                 'post' => null,
-                'message' => '该邮箱('.$Ucheck->email.')已被注册',
+                'message' => '该邮箱('.$user->email.')已被注册',
+            ]);
+        }
+        $user->phone = $request->json()->get('phone');
+        if($this->check($user->phone, 'phone')) {
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '该联系方式('.$user->phone.')已存在',
             ]);
         }
         $user->password = encrypt($request->json()->get('password'));
         $user->name = $request->json()->get('name');
-        $user->phone = $request->json()->get('phone');
         $user->save();
         return response()->json([
             'success' => true,
             'post' => $user,
             'message' => '注册成功',
         ])->header('status', 201);
-
     }
 
     /**
@@ -221,8 +259,8 @@ class UserController extends Controller
      */
     public function login(Request $request) {
         $email = $request->json()->get('email');
-        $user = $this->check($email);
-        if ($user) {
+        if ($this->check($email)) {
+            $user = User::with('branch')->where('email', $email)->first();
             $password = $request->json()->get('password');
             if ($password === decrypt($user->password)) {
                 $authorization = encrypt($user->email);
@@ -257,9 +295,8 @@ class UserController extends Controller
      * @param $email
      * @return mixed
      */
-    public function check($email) {
-        $user = User::with('branch')->where('email', $email)->first();
-        return $user;
+    public function check($param, $val = 'email') {
+        return User::where($val, $param)->exists();
     }
 
     public function test(){

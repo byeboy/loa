@@ -125,7 +125,6 @@ class FileController extends Controller
     }
 
     public static function getZip($files, $zipName) {
-//        return $files;
         //接收需下载的所有文件的路径
         //实例化zipArchive类
         $zip = new \ZipArchive();
@@ -142,10 +141,6 @@ class FileController extends Controller
                 'Content-Type' => 'Application/zip',
                 'Content-Length' => filesize($zipName),
             ];
-            /*return response()->json([
-                'zip' => $zip,
-                'name' => $zipName,
-            ]);*/
             return response()->download($zipName, $zipName, $headers);
         }
         //实现文件的下载

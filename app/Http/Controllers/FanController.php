@@ -275,6 +275,95 @@ class FanController extends Controller
         }
     }
 
+    public function record() {
+        $fans = Fan::with('records.operator')->get();
+        if($fans) {
+            return response()->json([
+                'success' => true,
+                'post' => [
+                    'fans' => $fans,
+                ],
+                'message' => '已获取所有风机信息'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '获取风机信息失败'
+            ]);
+        }
+    }
+
+    public function recorder(Request $request, $id){
+        $fan = Fan::find($id);
+        if($fan === null) {
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '该风机不存在',
+            ]);
+        }
+        $type = $request->json()->get('type');
+        $count = $request->json()->get('count');
+        if($type === 0 && $count > $fan->count){
+            return response()->json([
+                'success' => false,
+                'post' => null,
+                'message' => '该风机库存不足',
+            ]);
+        }
+        $remark = $request->json()->get('remark');
+        $operator_id = $request->json()->get('operator_id');
+        $recordrst = $fan->records()->create([
+            'type' => $type,
+            'count' => $count,
+            'remark' => $remark,
+            'operator_id' => $operator_id,
+        ]);
+        if($recordrst !== null) {
+            $operate = null;
+            switch ($type) {
+                case 0: {
+                    $fan->count -= $count;
+                    $operate = '出库';
+                    break;
+                }
+                case 1: {
+                    $fan->count += $count;
+                    $operate = '入库';
+                    break;
+                }
+                default: {
+                    return response()->json([
+                        'success' => false,
+                        'post' => null,
+                        'message' => '非法操作',
+                    ]);
+                }
+            }
+            if($fan->save()){
+                $newFan = Fan::with('records.operator')->find($id);
+                return response()->json([
+                    'success' => true,
+                    'post' => $newFan,
+                    'message' => $operate.'操作成功',
+                ]);
+            } else {
+                $fan->records()->detach([$recordrst->id]);
+                return response()->json([
+                    'success' => false,
+                    'post' => $fan,
+                    'message' => $operate.'操作失败',
+                ]);
+            }
+        }
+        return response()->json([
+            'success' => false,
+            'post' => $fan,
+            'message' => '操作失败',
+        ]);
+    }
+    
     /**
      * Check name of Fan
      *

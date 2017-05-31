@@ -14,6 +14,8 @@
 $app->get('/', function () use ($app) {
     return $app->version();
 });
+
+$app->get('records/export','ExcelController@export');
 $app->get('/models', 'ModelController@index');
 $app->get('/files/{type}/{id}', 'FileController@relation');
 $app->get('/notices', 'NoticeController@index');
@@ -47,6 +49,7 @@ $app->group(['prefix' => 'api'], function () use ($app) {
         $app->post('users', 'UserController@create');
         $app->put('users/{id}', 'UserController@update');
         $app->delete('users/{id}', 'UserController@delete');
+        $app->put('rewrite/{id}', 'UserController@rewrite');
 
         /**
          * Routes for Branch
@@ -187,6 +190,13 @@ $app->group(['prefix' => 'api'], function () use ($app) {
         $app->group(['prefix' => 'records'], function () use ($app) {
             $app->get('models', 'ModelController@record');
             $app->post('models/{id}', 'ModelController@recorder');
+            $app->get('cabinets', 'CabinetController@record');
+            $app->post('cabinets/{id}', 'CabinetController@recorder');
+            $app->get('fans', 'FanController@record');
+            $app->post('fans/{id}', 'FanController@recorder');
+            $app->get('parts', 'PartController@record');
+            $app->post('parts/{id}', 'PartController@recorder');
+            $app->get('export','ExcelController@export');
         });
     });
 
